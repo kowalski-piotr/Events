@@ -1,0 +1,32 @@
+{
+    "name":         "pchela/events",
+    "description":  "Zend Framework 2 Events Module",
+    "type":         "library",
+    "license":      "MIT",
+    "homepage":     "https://github.com/pchela/Events",
+    "keywords": [
+        "zf2",
+        "events"
+    ],
+    "authors": [
+        {
+            "name":      "Kowalski Piotr",
+            "email":     "piotr.a.kowalski@gmail.com",
+            "homepage":  "http://kowalski-piotr.pl/",
+            "role":      "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.3",
+        "doctrine/orm": ">=2.5.0"
+    },
+    "suggests": {
+        "zf-commons/zfc-user-doctrine-orm":   "If you want to use BjyAuthorize with Doctrine ORM"
+    },
+    "autoload": {
+        "psr-0": {
+            "Events\\": "src/"
+        }
+    }
+}

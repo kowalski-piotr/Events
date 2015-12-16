@@ -1,6 +1,7 @@
 # Composer files
 composer.phar
 vendor/
+nbproject/
 
 # Local configs
 config/autoload/*.local.php
