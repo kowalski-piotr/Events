@@ -21,9 +21,6 @@
         "php": ">=5.3.3",
         "doctrine/orm": ">=2.5.0"
     },
-    "suggests": {
-        "zf-commons/zfc-user-doctrine-orm":   "If you want to use BjyAuthorize with Doctrine ORM"
-    },
     "autoload": {
         "psr-0": {
             "Events\\": "src/"
