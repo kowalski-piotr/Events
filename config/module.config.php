@@ -11,11 +11,12 @@ return array(
     'router' => array(
         'routes' => array(
             'events' => array(
-                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'type' => 'Literal',
                 'options' => array(
                     'route' => '/events',
                     'defaults' => array(
-                        'controller' => 'Events',
+                        '__NAMESPACE__' => 'Events\Controller',
+                        'controller' => 'Index',
                         'action' => 'index',
                     ),
                 ),
@@ -34,9 +35,11 @@ return array(
         ),
     ),
     'view_manager' => array(
+        'template_path_stack' => array(
+            'events' => __DIR__ . '/../view',
+        ),
         'template_map' => array(
-            'events/layout' => __DIR__ . '/../view/layout.phtml',
-            'events/index' => __DIR__ . '/../view/index.phtml',
+            'layout/layout' => __DIR__ . '/../view/layout/layout.phtml',
         ),
     ),
 );

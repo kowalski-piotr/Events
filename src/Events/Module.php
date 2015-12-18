@@ -9,24 +9,18 @@
 
 namespace Events;
 
-use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
-class Module implements AutoloaderProviderInterface
+class Module implements AutoloaderProviderInterface, ConfigProviderInterface
 {
-
-    public function onBootstrap(EventInterface $event)
-    {
-        /* @var $app \Zend\Mvc\ApplicationInterface */
-        $app = $event->getTarget();
-    }
 
     /**
      * {@inheritDoc}
      */
     public function getConfig()
     {
-        return include __DIR__ . '/config/module.config.php';
+        return include __DIR__ . '/../../config/module.config.php';
     }
 
     /**
@@ -37,7 +31,7 @@ class Module implements AutoloaderProviderInterface
         return array(
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+                    __NAMESPACE__ => '../src/' . __NAMESPACE__,
                 ),
             ),
         );
