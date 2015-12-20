@@ -77,13 +77,13 @@ class IndexController extends AbstractActionController
         } else {
             //Jeżeli nie wysłano zapytania o wyniki wyszukiwania 
             //zwracamy wszystkie wydarzenia
-            $events = $this->eventService->findAllEvents();
+            $events = $this->eventService->getAllEvents();
         }
 
         return new ViewModel(array(
             'events' => $events,
             'form' => $searchForm,
-            'error' => $errors
+            'error' => $errors,
         ));
     }
 
@@ -111,7 +111,7 @@ class IndexController extends AbstractActionController
 
                     // wiadomość do administratora o dodaniu wydarzenia 
                     // nie działa na serwerze lokalnym
-//                    $this->eventService->sendNotify($event);
+//                    $this->eventService->sendNotify($event, 'admin..admin.pl');
 
                     return $this->redirect()->toRoute('events',
                                     array('action' => 'view', 'id' => $event->getId()));
@@ -151,7 +151,7 @@ class IndexController extends AbstractActionController
 
         // jeżeli podano niepoprawny identyfikator w adresie, 
         // przekieruj do strony tworzenia nowego wydarzenia
-        $event = $this->eventService->findEvent($id);
+        $event = $this->eventService->getEvent($id);
         if (!$event instanceof Event) {
             return $this->redirect()->toRoute('events', array('action' => 'add'));
         }
@@ -207,13 +207,13 @@ class IndexController extends AbstractActionController
 
         // jeżeli podano niepoprawny identyfikator w adresie, 
         // przekieruj do strony tworzenia nowego wydarzenia
-        $event = $this->eventService->findEvent($id);
+        $event = $this->eventService->getEvent($id);
         if (!$event instanceof Event) {
             return $this->redirect()->toUrl($previousUrl);
         }
 
         try {
-            $comment = $this->eventService->findComment($id);
+            $comment = $this->eventService->getComment($id);
             $this->eventService->remove($comment);
         } catch (Exception $e) {
             // TODO: Log exception

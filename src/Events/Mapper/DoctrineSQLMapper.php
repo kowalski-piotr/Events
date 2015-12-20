@@ -41,7 +41,10 @@ class DoctrineSQLMapper implements EventMapperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Wyszukuje wydarzenie po ID
+     * 
+     * @param int $id
+     * @return Event $event 
      */
     public function findEvent($id)
     {
@@ -49,7 +52,9 @@ class DoctrineSQLMapper implements EventMapperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Wyszukuje wszystkie wydarenia
+     * 
+     * @return ArrayObject $events
      */
     public function findAllEvents()
     {
@@ -57,7 +62,12 @@ class DoctrineSQLMapper implements EventMapperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Wyszukuje wydarzenia w zadanej odległości od podanych współrzędnych
+     * 
+     * @param float $lat
+     * @param float $lng
+     * @param int $distance
+     * @return ArrayObject $events
      */
     public function findEventsInRadius($lat, $lng, $distance = 2)
     {
@@ -104,7 +114,10 @@ class DoctrineSQLMapper implements EventMapperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Wyszukuje wydarzenia po nazwie, opisie, adresie oraz emailu
+     * 
+     * @param string $term
+     * @return ArrayObject $events
      */
     public function findEventsByTerm($term)
     {
@@ -123,7 +136,10 @@ class DoctrineSQLMapper implements EventMapperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Wyszukuje komentarz po ID
+     * 
+     * @param type $id
+     * @return Comment $commentt 
      */
     public function findComment($id)
     {
@@ -131,7 +147,10 @@ class DoctrineSQLMapper implements EventMapperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Zapisuje nowy lub zmieniony obiekt w bazie danych
+     * 
+     * @param object $entity
+     * @return object $entity
      */
     public function save($entity)
     {
@@ -140,58 +159,14 @@ class DoctrineSQLMapper implements EventMapperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Usuwa obiekt z bazy danych
+     * 
+     * @param object $entity
+     * @return void
      */
     public function remove($entity)
     {
         $this->entityManger->remove($entity);
         $this->entityManger->flush($entity);
     }
-
-//    public function findNearEvents($lat1, $lng1, $distance, $term = null)
-//    {
-//        $query = "
-//            SELECT
-//                subSel2.*
-//            FROM (
-//                SELECT
-//                    sin(subSel.dlat / 2) * 
-//                    sin(subSel.dlat / 2) + 
-//                    cos(subSel.lat1) * 
-//                    cos(subSel.lat2) * 
-//                    sin(subSel.dlng / 2) * 
-//                    sin(subSel.dlng / 2) sel,
-//                    subSel.*
-//                FROM (
-//                    SELECT 
-//                        (radians($lat1)-radians(lat)) dlat, 
-//                        (radians($lng1)-radians(lng)) dlng, 
-//                        radians(lat) lat1, 
-//                        radians(lng) lng1,
-//                        radians($lat1) lat2,
-//                        radians($lng1) lng2,
-//                        Event.*
-//                    From 
-//                        Event 
-//                ) subSel 
-//            ) subSel2
-//            WHERE
-//                (6372.797 * 
-//                (2 * atan2(sqrt(subSel2.sel), sqrt(1 - subSel2.sel)))) <= $distance
-//                    OR
-//                subSel2.name LIKE '%$term%'
-//                    OR
-//                subSel2.description LIKE '%$term%'
-//                    OR
-//                subSel2.address LIKE '%$term%'
-//                    OR
-//                subSel2.email LIKE '%$term%'
-//            ";
-//
-//        $rsm = new ResultSetMappingBuilder($this->entityManger);
-//        $rsm->addRootEntityFromClassMetadata('Events\Entity\Event', 'event');
-//        $nativeQuery = $this->entityManger->createNativeQuery($query, $rsm);
-//
-//        return $nativeQuery->getResult();
-//    }
 }

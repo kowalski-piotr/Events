@@ -169,18 +169,18 @@ class Event
 
     public function setFromDate($fromDate)
     {
-        if (is_string($fromDate)) {
-            $fromDate = new \DateTime($fromDate);
-        }
+//        if (is_string($fromDate)) {
+//            $fromDate = new \DateTime($fromDate);
+//        }
         $this->fromDate = $fromDate;
         return $this;
     }
 
     public function setToDate($toDate)
     {
-        if (is_string($toDate)) {
-            $toDate = new \DateTime($toDate);
-        }
+//        if (is_string($toDate)) {
+//            $toDate = new \DateTime($toDate);
+//        }
         $this->toDate = $toDate;
         return $this;
     }

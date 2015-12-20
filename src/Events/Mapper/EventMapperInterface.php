@@ -24,20 +24,22 @@ interface EventMapperInterface
 {
 
     /**
+     * Wyszukuje wydarzenie po ID
+     * 
      * @param int $id
      * @return Event $event 
      */
     public function findEvent($id);
 
     /**
-     * Zwraca wszystkie wydarenia
+     * Wyszukuje wszystkie wydarenia
      * 
      * @return ArrayObject $events
      */
     public function findAllEvents();
 
     /**
-     * Wyszukuje wydarzenia w zadanej odległości od podancyh współrzędnych
+     * Wyszukuje wydarzenia w zadanej odległości od podanych współrzędnych
      * 
      * @param float $lat
      * @param float $lng
@@ -55,13 +57,15 @@ interface EventMapperInterface
     public function findEventsByTerm($term);
 
     /**
+     * Wyszukuje komentarz po ID
+     * 
      * @param type $id
      * @return Comment $commentt 
      */
     public function findComment($id);
 
     /**
-     * Zapisuje nowy lub zmieniony obiekt bazie danych
+     * Zapisuje nowy lub zmieniony obiekt w bazie danych
      * 
      * @param object $entity
      * @return object $entity

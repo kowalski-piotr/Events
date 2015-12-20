@@ -24,27 +24,27 @@ interface EventServiceInterface
 {
 
     /**
-     * Wyszukuje wydarzenie po ID
+     * Zwraca wydarzenie o podanym ID
      * 
      * @param int $id
      * @return Event $event 
      */
-    public function findEvent($id);
+    public function getEvent($id);
 
     /**
-     * Zwraca wszystkie wydarenia
+     * Zwraca wszystkie wydarzenia
      * 
      * @return ArrayObject $events
      */
-    public function findAllEvents();
+    public function getAllEvents();
 
     /**
-     * Wyszukuje wydarzenia:
-     * w zadanej odległości od podancyh współrzędnych,
+     * Zwraca wydarzenia pasujące do podanego wyrażenia:
+     * w zadanej odległości od podanego adresu,
      * po nazwie, 
-     * opisie, 
-     * adresie 
-     * oraz adresie email
+     * po opisie, 
+     * po adresie 
+     * po adresie email użytkownika, który dodał wydarzenie
      * 
      * @param string $term
      * @param int $distance
@@ -54,7 +54,7 @@ interface EventServiceInterface
     
     /**
      * Wyszukuje współrzędne dla podanego adresu z wykorzystaniem
-     * Google Maps Api i ustawia wstawia je do Wydarzenia 
+     * Google Maps Api i wstawia je do Wydarzenia 
      * 
      * @param Event $event
      * @return Event $event
@@ -62,22 +62,22 @@ interface EventServiceInterface
     public function createCoordinates(Event $event);
 
     /**
-     * Wyszukuje komentarz do wydarzenia po ID
+     * Zwraca komentarz do wydarzenia po ID
      * 
      * @param type $id
      * @return Comment $commentt 
      */
-    public function findComment($id);
+    public function getComment($id);
 
     /**
-     * Wysyła wiadomość do administratora strony o dodanym wydarzeniu
+     * Wysyła wiadomość pod podany adres email ze szczegółami wydarzenia
      * 
      * @param Event $event
      */
-    public function sendNotify(Event $event);
+    public function sendNotify(Event $event, $recipient);
 
     /**
-     * Zapisuje nowy lub zmieniony obiekt bazie danych
+     * Zapisuje nowy lub zmieniony obiekt
      * 
      * @param object $entity
      * @return object $entity
@@ -85,7 +85,7 @@ interface EventServiceInterface
     public function save($entity);
 
     /**
-     * Usuwa obiekt z bazy danych
+     * Usuwa obiekt
      * 
      * @param object $entity
      * @return void

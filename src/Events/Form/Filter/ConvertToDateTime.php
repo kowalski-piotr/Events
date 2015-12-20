@@ -11,7 +11,8 @@
 
 namespace Events\Form\Filter;
 
-use Zend\Filter\FilterInterface;
+use DateTime;
+use Zend\Filter\DateTimeFormatter;
 
 /**
  * Events\Form\Filter\ConvertToDateTime
@@ -19,26 +20,33 @@ use Zend\Filter\FilterInterface;
  * Filtr konwertujący format daty zwracany przez element 
  * Zend\Form\Element\DateTimeSelect na format DateTime 
  */
-class ConvertToDateTime implements FilterInterface
+class ConvertToDateTime extends DateTimeFormatter
 {
 
     /**
-     * Zwraca wynik filtrowania podanej wartości
-     * 
-     * @param array $date
-     * @return \DateTime 
+     * Normalize the provided value to a formatted string
+     *
+     * @param  string|int|DateTime $value
+     * @return string
      */
-    public function filter($date)
+    protected function normalizeDateTime($value)
     {
-        if (!isset($date['second'])) {
-            $date['second'] = '00';
+        if ($value === '' || $value === null) {
+            return $value;
         }
 
-        $date = sprintf('%s-%s-%s %s:%s:%s', $date['year'], $date['month'],
-                $date['day'], $date['hour'], $date['minute'], $date['second']);
+        if (!is_string($value) && !is_int($value) && !$value instanceof DateTime) {
+            return $value;
+        }
 
+        if (is_int($value)) {
+            //timestamp
+            $value = new DateTime('@' . $value);
+        } elseif (!$value instanceof DateTime) {
+            $value = new DateTime($value);
+        }
 
-        return \DateTime::createFromFormat('Y-m-d H:i:s', $date);
+        return $value;
     }
 
 }

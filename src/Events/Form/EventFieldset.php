@@ -11,10 +11,12 @@
 
 namespace Events\Form;
 
-use Zend\Form\Fieldset;
-use Zend\Stdlib\Hydrator\ClassMethods;
+use DateInterval;
+use DateTime;
 use Events\Entity\Event;
+use Zend\Form\Fieldset;
 use Zend\InputFilter\InputFilterProviderInterface;
+use Zend\Stdlib\Hydrator\ClassMethods;
 
 /**
  * Zestaw pól formularza reprezentujących obiekt Event
@@ -164,22 +166,64 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
                 'required' => true,
                 'filters' => array(
                     // custom filter
-                    array('name' => 'Events\Form\Filter\ConvertToDateTime'),
+                    array(
+                        'name' => 'Events\Form\Filter\ConvertToDateTime',
+                        'options' => array(
+                            'format' => "Y-m-d H:i:s"
+                        )
+                    ),
                 ),
                 'validators' => array(
                     // custom validator
-                    array('name' => 'Events\Form\Validator\isDateOffset'),
+                    array(
+                        'name' => 'Zend\Validator\Date',
+                        'options' => array(
+                            'format' => 'Y-m-d H:i:s'
+                        )
+                    ),
+                    array(
+                        'name' => 'Events\Form\Validator\DateGreaterThan',
+                        'options' => array(
+                            'min' => (new DateTime("now"))->add(new DateInterval('P7D')),
+                        ),
+                    ),
+//                    array('name' => 'Events\Form\Validator\isDateOffset'),
+//                    array(
+//                        'name' => 'Zend\Validator\DateStep',
+//                        'options' => array(
+//                            'format' => 'Y-m-d H:i:s',
+//                            'baseValue' => new DateTime("now"),
+//                            'step' => new DateInterval('P7D')
+//                        ),
+//                    ),
                 )
             ),
             'toDate' => array(
                 'required' => true,
                 'filters' => array(
-                    // custom filter
-                    array('name' => 'Events\Form\Filter\ConvertToDateTime')
+                    array(
+                        'name' => 'Events\Form\Filter\ConvertToDateTime',
+                        'options' => array(
+                            'format' => "Y-m-d H:i:s"
+                        )
+                    ),
                 ),
                 'validators' => array(
+                    array(
+                        'name' => 'Zend\Validator\Date',
+                        'options' => array(
+                            'format' => 'Y-m-d H:i:s'
+                        )
+                    ),
+                    array(
+                        'name' => 'Events\Form\Validator\DateGreaterThan',
+                        'options' => array(
+                            'min' => $this->get('fromDate')->getValue(),
+                            'format' => 'Y-m-d H:i'
+                        ),
+                    ),
                     // custom validator
-                    array('name' => 'Events\Form\Validator\isDateAfter'),
+//                    array('name' => 'Events\Form\Validator\isDateAfter'),
                 ),
             ),
         );

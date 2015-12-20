@@ -1,22 +1,31 @@
 <?php
 
 /**
- * Zend Framework 2 Events Module 
+ * Zend Framework 2 Events Module
  *
- * @link      https://github.com/pchela/Events
- * @copyright Copyright (c) 2015 Kowalski Piotr (pchel)
- * @license   https://opensource.org/licenses/MIT MIT License
+ * @link      http://github.com/pchela/events 
+ * @copyright Copyright (c) 20015 Kowalski Piotr (http://www.kowalski-piotr.pl)
+ * @license   https://opensource.org/licenses/MIT
+ * @since     File available since Release 0.0.1
  */
 
 namespace Events;
 
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
-class Module implements AutoloaderProviderInterface
+/**
+ * Events\Factory\IndexControllerFactory
+ * 
+ * Fabryka tworząca obiekt klasy IndexController
+ */
+class Module implements AutoloaderProviderInterface, ConfigProviderInterface
 {
 
     /**
-     * {@inheritDoc}
+     * Returns configuration to merge with application configuration
+     *
+     * @return array|\Traversable
      */
     public function getConfig()
     {
@@ -24,7 +33,9 @@ class Module implements AutoloaderProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Return an array for passing to Zend\Loader\AutoloaderFactory.
+     *
+     * @return array
      */
     public function getAutoloaderConfig()
     {
