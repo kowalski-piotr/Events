@@ -1,59 +1,197 @@
 <?php
 
-/*
- * The MIT License
+/**
+ * Zend Framework 2 Events Module
  *
- * Copyright 2015 pchel.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * @link      http://github.com/pchela/events 
+ * @copyright Copyright (c) 20015 Kowalski Piotr (http://www.kowalski-piotr.pl)
+ * @license   https://opensource.org/licenses/MIT
+ * @since     File available since Release 0.0.1
  */
 
 namespace Events\Mapper;
 
-use Events\Mapper\EventMapperInterface;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Events\Mapper\EventMapperInterface;
 
+/**
+ * Events\Mapper\DoctrineSQLMapper
+ * 
+ * Implementacja mappera bazy danych 
+ */
 class DoctrineSQLMapper implements EventMapperInterface
 {
-    /*
-     * @var EntityManager
+
+    /**
+     * Centralny punkt dostępu do wszystkich funkcji Doctrine ORM - fasada
+     * 
+     * @var EntityManager $entityManger
      */
     protected $entityManger;
-    
+
+    /**
+     * Konstruktor (obiekt tworzony przez DoctrineSQLMapperFactory) 
+     * 
+     * @param EntityManager $entityManager
+     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManger = $entityManager;
     }
-    public function find($id)
+
+    /**
+     * {@inheritDoc}
+     */
+    public function findEvent($id)
     {
-        $this->entityManger->find($entityName, $id);
+        return $this->entityManger->find('Events\Entity\Event', $id);
     }
 
-    public function findAll()
+    /**
+     * {@inheritDoc}
+     */
+    public function findAllEvents()
     {
-        
+        return $this->entityManger->getRepository('Events\Entity\Event')->findAll();
     }
 
-    public function save($eventObject)
+    /**
+     * {@inheritDoc}
+     */
+    public function findEventsInRadius($lat, $lng, $distance = 2)
     {
-        $this->entityManger->persist($eventObject);
-        $this->entityManger->flush($eventObject);
+        $query = "
+            SELECT
+                subSel2.*
+            FROM (
+                SELECT
+                    sin(subSel.dlat / 2) * 
+                    sin(subSel.dlat / 2) + 
+                    cos(subSel.lat1) * 
+                    cos(subSel.lat2) * 
+                    sin(subSel.dlng / 2) * 
+                    sin(subSel.dlng / 2) sel,
+                    subSel.*
+                FROM (
+                    SELECT 
+                        (radians(:lat)-radians(lat)) dlat, 
+                        (radians(:lng)-radians(lng)) dlng, 
+                        radians(lat) lat1, 
+                        radians(lng) lng1,
+                        radians(:lat) lat2,
+                        radians(:lng) lng2,
+                        Event.*
+                    From 
+                        Event 
+                ) subSel 
+            ) subSel2
+            WHERE
+                (6372.797 * 
+                (2 * atan2(sqrt(subSel2.sel), sqrt(1 - subSel2.sel)))) <= :distance
+            ";
+
+        $rsm = new ResultSetMappingBuilder($this->entityManger);
+        $rsm->addRootEntityFromClassMetadata('Events\Entity\Event', 'event');
+        $nativeQuery = $this->entityManger->createNativeQuery($query, $rsm);
+        $nativeQuery->setParameters(array(
+            'lat' => $lat,
+            'lng' => $lng,
+            'distance' => $distance,
+        ));
+
+        return $nativeQuery->getResult();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function findEventsByTerm($term)
+    {
+
+        $query = $this->entityManger->createQueryBuilder()
+                ->select('event')
+                ->from('Events\Entity\Event', 'event')
+                ->where('event.name LIKE :term')
+                ->orWhere('event.description LIKE :term')
+                ->orWhere('event.address LIKE :term')
+                ->orWhere('event.email LIKE :term')
+                ->setParameter('term', '%' . $term . '%')
+                ->getQuery();
+
+        return $query->getResult();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function findComment($id)
+    {
+        return $this->entityManger->find('Events\Entity\Comment', $id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function save($entity)
+    {
+        $this->entityManger->persist($entity);
+        $this->entityManger->flush();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function remove($entity)
+    {
+        $this->entityManger->remove($entity);
+        $this->entityManger->flush($entity);
+    }
+
+//    public function findNearEvents($lat1, $lng1, $distance, $term = null)
+//    {
+//        $query = "
+//            SELECT
+//                subSel2.*
+//            FROM (
+//                SELECT
+//                    sin(subSel.dlat / 2) * 
+//                    sin(subSel.dlat / 2) + 
+//                    cos(subSel.lat1) * 
+//                    cos(subSel.lat2) * 
+//                    sin(subSel.dlng / 2) * 
+//                    sin(subSel.dlng / 2) sel,
+//                    subSel.*
+//                FROM (
+//                    SELECT 
+//                        (radians($lat1)-radians(lat)) dlat, 
+//                        (radians($lng1)-radians(lng)) dlng, 
+//                        radians(lat) lat1, 
+//                        radians(lng) lng1,
+//                        radians($lat1) lat2,
+//                        radians($lng1) lng2,
+//                        Event.*
+//                    From 
+//                        Event 
+//                ) subSel 
+//            ) subSel2
+//            WHERE
+//                (6372.797 * 
+//                (2 * atan2(sqrt(subSel2.sel), sqrt(1 - subSel2.sel)))) <= $distance
+//                    OR
+//                subSel2.name LIKE '%$term%'
+//                    OR
+//                subSel2.description LIKE '%$term%'
+//                    OR
+//                subSel2.address LIKE '%$term%'
+//                    OR
+//                subSel2.email LIKE '%$term%'
+//            ";
+//
+//        $rsm = new ResultSetMappingBuilder($this->entityManger);
+//        $rsm->addRootEntityFromClassMetadata('Events\Entity\Event', 'event');
+//        $nativeQuery = $this->entityManger->createNativeQuery($query, $rsm);
+//
+//        return $nativeQuery->getResult();
+//    }
 }

@@ -1,37 +1,37 @@
 <?php
 
-/*
- * The MIT License
+/**
+ * Zend Framework 2 Events Module
  *
- * Copyright 2015 pchel.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * @link      http://github.com/pchela/events 
+ * @copyright Copyright (c) 20015 Kowalski Piotr (http://www.kowalski-piotr.pl)
+ * @license   https://opensource.org/licenses/MIT
+ * @since     File available since Release 0.0.1
  */
 
 namespace Events\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
-/** @ORM\Entity */
+/**
+ * Klasa reprezentująca wydarzenie
+ * Encja z adnotacjami Doctrine ORM 
+ * 
+ * @ORM\Entity 
+ */
 class Event
 {
+
+    /**
+     * Nowe wydarzenie musi rozpoczynać się przynajmniej 
+     * za @DAY_OFFSET dni od daty dodawania wydarzenia
+     * 
+     * @const DAY_OFFSET
+     */
     const DAY_OFFSET = 7;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -40,39 +40,73 @@ class Event
     protected $id;
 
     /**
+     * Nazwa wydarzenia
+     * 
      * @ORM\Column(type="string", length=50) 
      */
     protected $name;
 
     /**
+     * Opis wydarzenia
+     * 
      * @ORM\Column(type="string") 
      */
     protected $description;
 
     /**
+     * Adres wydarzenia
+     * 
      * @ORM\Column(type="string", length=300) 
      */
     protected $address;
 
     /**
+     * Email użytkownika dodającego wydarzenia
+     * 
      * @ORM\Column(type="string", length=50) 
      */
     protected $email;
 
     /**
+     * Data rozpoczęcia wydarzenia
+     * 
      * @ORM\Column(type="datetime") 
      */
     protected $fromDate;
 
     /**
+     * Data zakończenia wydarzenia
+     * 
      * @ORM\Column(type="datetime") 
      */
     protected $toDate;
 
     /**
-     * @ORM\Column(type="string", nullable=true) 
+     * Szerkość geograficzna 
+     * 
+     * @ORM\Column(type="string", length=15, nullable=true) 
      */
-    protected $coordinates;
+    protected $lat;
+
+    /**
+     * Długość geograficzna
+     * 
+     * @ORM\Column(type="string", length=15, nullable=true) 
+     */
+    protected $lng;
+
+    /**
+     * Komentarze do wydarzenia
+     * 
+     * @var ArrayCollection $comments
+     * @ORM\OneToMany(targetEntity="Comment", mappedBy="event", cascade={"ALL"})
+     */
+    protected $comments;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+    }
 
     public function getId()
     {
@@ -109,11 +143,6 @@ class Event
         return $this->toDate;
     }
 
-    public function getCoordinates()
-    {
-        return $this->coordinates;
-    }
-
     public function setName($name)
     {
         $this->name = $name;
@@ -140,8 +169,7 @@ class Event
 
     public function setFromDate($fromDate)
     {
-        if (is_string($fromDate))
-        {
+        if (is_string($fromDate)) {
             $fromDate = new \DateTime($fromDate);
         }
         $this->fromDate = $fromDate;
@@ -150,18 +178,77 @@ class Event
 
     public function setToDate($toDate)
     {
-        if (is_string($toDate))
-        {
+        if (is_string($toDate)) {
             $toDate = new \DateTime($toDate);
         }
         $this->toDate = $toDate;
         return $this;
     }
 
-    public function setCoordinates($coordinates)
+    public function getLat()
     {
-        $this->coordinates = $coordinates;
+        return $this->lat;
+    }
+
+    public function getLng()
+    {
+        return $this->lng;
+    }
+
+    public function setLat($lat)
+    {
+        $this->lat = $lat;
         return $this;
+    }
+
+    public function setLng($lng)
+    {
+        $this->lng = $lng;
+        return $this;
+    }
+
+    public function getComments()
+    {
+        return $this->comments;
+    }
+
+    public function setComments($comments)
+    {
+        $this->comments = $comments;
+        return $this;
+    }
+
+    public function addComments(Collection $collection)
+    {
+        foreach ($collection as $item) {
+            $item->setEvent($this);
+            $this->comments->add($item);
+        }
+    }
+
+    public function addComment(Comment $comment)
+    {
+        $comment->setEvent($this);
+        $this->comments->add($comment);
+    }
+
+    public function removeComments(Collection $collection)
+    {
+        foreach ($collection as $item) {
+            $item->setEvent(null);
+            $this->comments->removeElement($item);
+        }
+    }
+
+    public function setCoordinates(array $coordinates)
+    {
+        if (isset($coordinates['lat'])) {
+            $this->setLat($coordinates['lat']);
+        }
+        
+        if (isset($coordinates['lng'])) {
+            $this->setLng($coordinates['lng']);
+        }
     }
 
 }

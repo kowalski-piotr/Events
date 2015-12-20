@@ -5,30 +5,46 @@
                 <h3 class="panel-title">Users</h3>
             </div>
             <div class="panel-body">
-                <a href="<?php echo $this->url('events', array('action'=>'add'));?>">Add Event</a>
+                <a href="/events/add">Add Event</a>
+                <a href="/events">Clear search</a>
+                <?php
+                $form = $this->form;
+                $form->setAttribute('action', $this->url());
+                $form->prepare();
+
+                echo $this->form()->openTag($form);
+
+                echo $this->formRow($form->get('search'));
+                echo $this->formSubmit($form->get('submit'));
+                
+                echo $this->form()->closeTag();
+                ?>
 
                 <?php if (isset($events)) : ?>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Full name</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                <?php foreach($events as $event): ?>
-                    <tbody>
-                    <tr>
-                        <td><?php echo $event->getId(); ?></td>
-                        <td><?php echo $event->getFullName(); ?></td>
-                        <td>
-                            <a href="<?php echo $this->url('event', array('action'=>'edit', 'id' => $event->getId()));?>">Edit</a> |
-                            <a href="<?php echo $this->url('event', array('action'=>'delete', 'id' => $event->getId()));?>">Delete</a>
-                        </td>
-                    </tr>
-                    </tbody>
-                <?php endforeach; ?>
-                </table>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Title</th>
+                                <th>Address</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <?php foreach ($events as $event): ?>
+                            <tbody>
+                                <tr>
+                                    <td><?php echo $event->getId(); ?></td>
+                                    <td><?php echo $event->getName(); ?></td>
+                                    <td><?php echo $event->getAddress(); ?></td>
+                                    <td>
+                                        <a href="events/edit/<?php echo $event->getId() ?>">Edit</a> |
+                                        <a href="events/delete/<?php echo $event->getId() ?>">Delete</a> |
+                                        <a href="events/view/<?php echo $event->getId() ?>">View</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        <?php endforeach; ?>
+                    </table>
                 <?php endif; ?>
             </div>
         </div>

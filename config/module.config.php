@@ -11,9 +11,13 @@ return array(
     'router' => array(
         'routes' => array(
             'events' => array(
-                'type' => 'Literal',
+                'type' => 'segment',
                 'options' => array(
-                    'route' => '/events',
+                    'route' => '/events[/:action][/:id]',
+                    'constraints' => array(
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+',
+                    ),
                     'defaults' => array(
                         '__NAMESPACE__' => 'Events\Controller',
                         'controller' => 'Index',
@@ -21,38 +25,53 @@ return array(
                     ),
                 ),
                 'may_terminate' => true,
-                'child_routes' => array(
-                    'detail' => array(
-                        'type' => 'segment',
-                        'options' => array(
-                            'route' => '/:id',
-                            'defaults' => array(
-                                'action' => 'detail'
-                            ),
-                            'constraints' => array(
-                                'id' => '\d+'
-                            )
-                        )
-                    ),
-                    'add' => array(
-                        'type' => 'literal',
-                        'options' => array(
-                            'route' => '/add',
-                            'defaults' => array(
-                                'controller' => 'Events\Controller\Index',
-                                'action' => 'add'
-                            )
-                        )
-                    )
-                )
+//                'child_routes' => array(
+//                    'detail' => array(
+//                        'type' => 'segment',
+//                        'options' => array(
+//                            'route' => '/:id',
+//                            'defaults' => array(
+//                                'action' => 'detail'
+//                            ),
+//                            'constraints' => array(
+//                                'id' => '\d+'
+//                            )
+//                        )
+//                    ),
+//                    'add' => array(
+//                        'type' => 'literal',
+//                        'options' => array(
+//                            'route' => '/add',
+//                            'defaults' => array(
+//                                'controller' => 'Events\Controller\Index',
+//                                'action' => 'add'
+//                            )
+//                        )
+//                    ),
+//                    'view' => array(
+//                        'type' => 'segment',
+//                        'options' => array(
+//                            'route' => '/view/:id',
+//                            'defaults' => array(
+//                                'action' => 'view'
+//                            ),
+//                            'constraints' => array(
+//                                'id' => '\d+'
+//                            )
+//                        ),
+//                    )
+//                )
             ),
         ),
     ),
     'service_manager' => array(
         'factories' => array(
             'Events\Service\EventServiceInterface' => 'Events\Factory\EventServiceFactory',
-            'Events\Mapper\EventMapperInterface'   => 'Events\Factory\DoctrineSQLMapperFactory',
-        )
+            'Events\Mapper\EventMapperInterface' => 'Events\Factory\DoctrineSQLMapperFactory',
+        ),
+//        'invokables' => array(
+//            'Events\Service\MapsServiceInterface' => 'Events\Service\GoogleMapsService',
+//        )
     ),
     'controllers' => array(
         'factories' => array(
@@ -65,6 +84,8 @@ return array(
         ),
         'template_map' => array(
             'layout/layout' => __DIR__ . '/../view/layout/layout.phtml',
+            'error/404' => __DIR__ . '/../view/error/404.phtml',
+            'error/index' => __DIR__ . '/../view/error/index.phtml',
         ),
     ),
     'doctrine' => array(

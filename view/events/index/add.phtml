@@ -2,7 +2,7 @@
  <h1>WriteController::addAction()</h1>
  <?php
  $form = $this->form;
- $form->setAttribute('action', $this->url());
+ $form->setAttribute('action', $this->url('events', array('action' => 'add')));
  $form->prepare();
 
  echo $this->form()->openTag($form);

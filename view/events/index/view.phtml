@@ -1,0 +1,37 @@
+<?php
+$title = 'View event';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+<h2><?php echo $event->getName(); ?></h2>
+<h3><?php echo $event->getDescription(); ?></h3>
+<p> <?php echo $event->getAddress(); ?></p>
+<p> <?php echo $event->getEmail(); ?></p>
+<p> <?php echo $event->getFromDate()->format('Y-m-d H:i:s'); ?></p>
+<p> <?php echo $event->getToDate()->format('Y-m-d H:i:s'); ?></p>
+<?php foreach ($event->getComments() as $comment) : ?>
+
+
+<h4 style="display: inline-block;"><small>email: </small><?php echo $comment->getEmail(); ?></h4>
+<a href="<?php echo $this->url('events', array('action' => 'removeComment', 'id' => $comment->getId())); ?>">
+    <span style="margin-left: 50px;" class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+</a>
+    <p><?php echo $comment->getContent(); ?></p>
+
+<?php endforeach; ?>
+
+
+<?php
+$form = $this->form;
+
+
+$tes = $this->url('events', array('action' => 'view', 'id' => $event->getId()));
+$form->prepare();
+
+echo $this->form()->openTag($form);
+
+echo $this->formCollection($form);
+
+echo $this->form()->closeTag();
+?>

@@ -14,9 +14,9 @@ namespace Events\Form;
 use Zend\Form\Form;
 
 /**
- * Formularz wydarzenia
+ * Formularz komentarza
  */
-class EventForm extends Form
+class CommentForm extends Form
 {
 
     /**
@@ -28,8 +28,8 @@ class EventForm extends Form
         parent::__construct($name, $options);
 
         $this->add(array(
-            'name' => 'event-fieldset',
-            'type' => 'Events\Form\EventFieldset',
+            'name' => 'comment-fieldset',
+            'type' => 'Events\Form\CommentFieldset',
             'options' => array(
                 'use_as_base_fieldset' => true
             )
@@ -39,7 +39,7 @@ class EventForm extends Form
             'type' => 'submit',
             'name' => 'submit',
             'attributes' => array(
-                'value' => 'Insert new Event'
+                'value' => 'Leave comment'
             )
         ));
     }

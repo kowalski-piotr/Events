@@ -1,103 +1,227 @@
 <?php
 
 /**
- * Zend Framework (http://framework.zend.com/)
+ * Zend Framework 2 Events Module
  *
- * @link      http://github.com/zendframework/ZendSkeletonEvents for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @link      http://github.com/pchela/events 
+ * @copyright Copyright (c) 20015 Kowalski Piotr (http://www.kowalski-piotr.pl)
+ * @license   https://opensource.org/licenses/MIT
+ * @since     File available since Release 0.0.1
  */
 
 namespace Events\Controller;
 
+use Events\Entity\Comment;
+use Events\Entity\Event;
+use Events\Form\CommentForm;
+use Events\Form\EventForm;
+use Events\Form\SearchForm;
+use Events\Service\EventService;
+use Events\Service\EventServiceInterface;
+use Exception;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-use Events\Service\EventServiceInterface;
-use Events\Form\EventForm;
 
+/**
+ * Events\Controller\IndexController
+ * 
+ * Główny kontroler modułu 
+ */
 class IndexController extends AbstractActionController
 {
 
+    /**
+     * Obiekt EventService odpowiedzialny za logikę aplikacji
+     * Service-Layer
+     * 
+     * @var EventService $eventService
+     */
     protected $eventService;
-    protected $eventForm;
 
-    public function __construct(
-            EventServiceInterface $eventService, 
-            EventForm $eventForm)
+    /**
+     * Konstruktor 
+     * 
+     * @param EventServiceInterface $eventService
+     */
+    public function __construct(EventServiceInterface $eventService)
     {
         $this->eventService = $eventService;
-        $this->eventForm = $eventForm;
     }
 
+    /**
+     * Akcja odpowiedzialna za wyświetlanie i przeszukiwanie wydarzeń,
+     * 
+     * @return ViewModel route: /events
+     */
     public function indexAction()
     {
-//        $events = $this->entityManager->getRepository('Events\Entity\Event')->findAll();
-        return new ViewModel(array('events' => $events));
-    }
-
-    public function addAction()
-    {
+        $events = array();
+        $errors = array();
+        $searchForm = new SearchForm();
         $request = $this->getRequest();
 
-        if ($request->isPost())
-        {
-            $event = new \Events\Entity\Event();
-            $this->eventForm->bind($event);
-            $this->eventForm->setData($request->getPost());
+        //Jeżeli wysłano zapytanie o wyniki wyszukiwania
+        //zwracamy tylko wydarzenia spełniające warunki
+        if ($request->isPost()) {
+            $searchForm->setData($request->getPost());
+            if ($searchForm->isValid()) {
+                $term = $searchForm->get('search')->getValue();
+                try {
+                    $events = $this->eventService->searchEvent($term);
+                } catch (Exception $e) {
+                    // TODO: Log exception
+                    // TODO: Translation
+                    $errors[] = "Coś poszło nie tak :( Prosimy spróbować za chwilę";
+                }
+            }
+        } else {
+            //Jeżeli nie wysłano zapytania o wyniki wyszukiwania 
+            //zwracamy wszystkie wydarzenia
+            $events = $this->eventService->findAllEvents();
+        }
 
-            if ($this->eventForm->isValid())
-            {
-                try
-                {
-                    $this->eventService->saveEvent($event);
+        return new ViewModel(array(
+            'events' => $events,
+            'form' => $searchForm,
+            'error' => $errors
+        ));
+    }
 
-                    return $this->redirect()->toRoute('events');
-                } catch (\Exception $e)
-                {
-                    // Some DB Error happened, log it and let the user know
+    /**
+     * Akcja odpowiedzialna za dodawanie nowych wydarzeń, 
+     * 
+     * @return ViewModel route: /events/add
+     */
+    public function addAction()
+    {
+        $errors = array();
+        $eventForm = new EventForm();
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $event = new Event();
+            $eventForm->bind($event);
+            $eventForm->setData($request->getPost());
+
+            if ($eventForm->isValid()) {
+                $this->eventService->createCoordinates($event);
+
+                try {
+                    $this->eventService->save($event);
+
+                    // wiadomość do administratora o dodaniu wydarzenia 
+                    // nie działa na serwerze lokalnym
+//                    $this->eventService->sendNotify($event);
+
+                    return $this->redirect()->toRoute('events',
+                                    array('action' => 'view', 'id' => $event->getId()));
+                } catch (Exception $e) {
+                    // TODO: Log exception
+                    // TODO: Translation
+                    $errors[] = "Coś poszło nie tak :( Prosimy spróbować za chwilę";
                 }
             }
         }
 
         return new ViewModel(array(
-            'form' => $this->eventForm
+            'form' => $eventForm,
+            'error' => $errors
         ));
     }
 
-    public function editAction()
+    /**
+     * Akcja odpowiedzialna za wyświetlanie szczegółowych informacji 
+     * o wydarzeniu oraz dodawanie komentarzy,
+     * 
+     * @return ViewModel ($event, $commentForm)
+     */
+    public function viewAction()
     {
+        $errors = array();
+        $commentForm = new CommentForm();
+        $request = $this->getRequest();
+
         $id = (int) $this->params()->fromRoute('id', 0);
-        $event = $this->getObjectManager()->find('\Events\Entity\Event', $id);
-        if ($this->request->isPost())
-        {
-            $event->setFullName($this->getRequest()->getPost('fullname'));
-            $this->getObjectManager()->persist($event);
-            $this->getObjectManager()->flush();
-            return $this->redirect()->toRoute('home');
+
+        // jeżeli nie podano identyfikatora w adresie, 
+        // przekieruj do strony tworzenia nowego wydarzenia
+        if (!$id) {
+            return $this->redirect()->toRoute('events', array('action' => 'add'));
         }
-        return new ViewModel(array('event' => $event));
+
+        // jeżeli podano niepoprawny identyfikator w adresie, 
+        // przekieruj do strony tworzenia nowego wydarzenia
+        $event = $this->eventService->findEvent($id);
+        if (!$event instanceof Event) {
+            return $this->redirect()->toRoute('events', array('action' => 'add'));
+        }
+
+        // zapisujemy komentarz jeżeli go komentarz
+        if ($request->isPost()) {
+
+            $comment = new Comment();
+            $commentForm->bind($comment);
+            $commentForm->setData($request->getPost());
+
+            if ($commentForm->isValid()) {
+                $comment->setEvent($event);
+
+                // zapisujemy IP użytkownika dodającego komentarz
+                $userIp = $request->getServer()->get('REMOTE_ADDR');
+                $comment->setIp($userIp);
+
+                try {
+                    $this->eventService->save($comment);
+                } catch (Exception $e) {
+                    // TODO: Log exception
+                    // TODO: Translation
+                    $errors[] = "Coś poszło nie tak :( Prosimy spróbować za chwilę";
+                }
+            }
+        }
+
+        return new ViewModel(array(
+            'event' => $event,
+            'form' => $commentForm,
+            'error' => $errors
+        ));
     }
 
-    public function deleteAction()
+    /**
+     * Akcja odpowiedzialna za usuwanie komentarzy do wydarzenia
+     * 
+     * @return void 
+     */
+    public function removeCommentAction()
     {
-        $id = (int) $this->params()->fromRoute('id', 0);
-        $event = $this->getObjectManager()->find('\Events\Entity\Event', $id);
-        if ($this->request->isPost())
-        {
-            $this->getObjectManager()->remove($event);
-            $this->getObjectManager()->flush();
-            return $this->redirect()->toRoute('home');
-        }
-        return new ViewModel(array('event' => $event));
-    }
+        // adres poprzednio odwiedzanej strony użytkownika
+        $previousUrl = $this->getRequest()->getHeader('Referer')->getUri();
 
-    protected function getObjectManager()
-    {
-        if (!$this->_objectManager)
-        {
-            $this->_objectManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
+        $id = (int) $this->params()->fromRoute('id', 0);
+
+        // jeżeli nie podano identyfikatora w adresie, 
+        // przekieruj do strony tworzenia nowego wydarzenia
+        if (!$id) {
+            return $this->redirect()->toUrl($previousUrl);
         }
-        return $this->_objectManager;
+
+        // jeżeli podano niepoprawny identyfikator w adresie, 
+        // przekieruj do strony tworzenia nowego wydarzenia
+        $event = $this->eventService->findEvent($id);
+        if (!$event instanceof Event) {
+            return $this->redirect()->toUrl($previousUrl);
+        }
+
+        try {
+            $comment = $this->eventService->findComment($id);
+            $this->eventService->remove($comment);
+        } catch (Exception $e) {
+            // TODO: Log exception
+            // TODO: Translation
+            $errors[] = "Coś poszło nie tak :( Prosimy spróbować za chwilę";
+        }
+
+        return $this->redirect()->toUrl($previousUrl);
     }
 
 }

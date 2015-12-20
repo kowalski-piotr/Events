@@ -1,58 +1,94 @@
 <?php
 
-/*
- * The MIT License
+/**
+ * Zend Framework 2 Events Module
  *
- * Copyright 2015 pchel.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * @link      http://github.com/pchela/events 
+ * @copyright Copyright (c) 20015 Kowalski Piotr (http://www.kowalski-piotr.pl)
+ * @license   https://opensource.org/licenses/MIT
+ * @since     File available since Release 0.0.1
  */
 
 namespace Events\Service;
 
-use Events\Model\EventInterface;
+use ArrayObject;
+use Events\Entity\Comment;
+use Events\Entity\Event;
 
+/**
+ * Events\Service\EventServiceInterface
+ * 
+ * Interfejs warstwy biznesowej aplikacji
+ */
 interface EventServiceInterface
 {
 
     /**
-     * Should return a set of all blog posts that we can iterate over. Single entries of the array are supposed to be
-     * implementing \Blog\Model\EventInterface
-     *
-     * @return array|EventInterface[]
-     */
-    public function findAllEvents();
-
-    /**
-     * Should return a single blog post
-     *
-     * @param  int $id Identifier of the Event that should be returned
-     * @return EventInterface
+     * Wyszukuje wydarzenie po ID
+     * 
+     * @param int $id
+     * @return Event $event 
      */
     public function findEvent($id);
 
     /**
-     * Should save a given implementation of the EventInterface and return it. If it is an existing Event the Event
-     * should be updated, if it's a new Event it should be created.
-     *
-     * @param  EventInterface $blog
-     * @return EventInterface
+     * Zwraca wszystkie wydarenia
+     * 
+     * @return ArrayObject $events
      */
-    public function saveEvent($event);
+    public function findAllEvents();
+
+    /**
+     * Wyszukuje wydarzenia:
+     * w zadanej odległości od podancyh współrzędnych,
+     * po nazwie, 
+     * opisie, 
+     * adresie 
+     * oraz adresie email
+     * 
+     * @param string $term
+     * @param int $distance
+     * @return ArrayObject $events
+     */
+    public function searchEvent($term, $distance);
+    
+    /**
+     * Wyszukuje współrzędne dla podanego adresu z wykorzystaniem
+     * Google Maps Api i ustawia wstawia je do Wydarzenia 
+     * 
+     * @param Event $event
+     * @return Event $event
+     */
+    public function createCoordinates(Event $event);
+
+    /**
+     * Wyszukuje komentarz do wydarzenia po ID
+     * 
+     * @param type $id
+     * @return Comment $commentt 
+     */
+    public function findComment($id);
+
+    /**
+     * Wysyła wiadomość do administratora strony o dodanym wydarzeniu
+     * 
+     * @param Event $event
+     */
+    public function sendNotify(Event $event);
+
+    /**
+     * Zapisuje nowy lub zmieniony obiekt bazie danych
+     * 
+     * @param object $entity
+     * @return object $entity
+     */
+    public function save($entity);
+
+    /**
+     * Usuwa obiekt z bazy danych
+     * 
+     * @param object $entity
+     * @return void
+     */
+    public function remove($entity);
 }

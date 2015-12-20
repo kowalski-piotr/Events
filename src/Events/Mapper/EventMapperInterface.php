@@ -1,53 +1,78 @@
 <?php
 
-/* 
- * The MIT License
+/**
+ * Zend Framework 2 Events Module
  *
- * Copyright 2015 pchel.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * @link      http://github.com/pchela/events 
+ * @copyright Copyright (c) 20015 Kowalski Piotr (http://www.kowalski-piotr.pl)
+ * @license   https://opensource.org/licenses/MIT
+ * @since     File available since Release 0.0.1
  */
 
- namespace Events\Mapper;
+namespace Events\Mapper;
 
- use Events\Model\EventInterface;
+use ArrayObject;
+use Events\Entity\Comment;
+use Events\Entity\Event;
 
- interface EventMapperInterface
- {
-     /**
-      * @param int|string $id
-      * @return PostInterface
-      * @throws \InvalidArgumentException
-      */
-     public function find($id);
+/**
+ * Events\Mapper\EventMapperInterface
+ * 
+ * Interfejs abstrakcyjnej warstwy bazy danych (Mapper-Layer)
+ */
+interface EventMapperInterface
+{
 
-     /**
-      * @return array|PostInterface[]
-      */
-     public function findAll();
+    /**
+     * @param int $id
+     * @return Event $event 
+     */
+    public function findEvent($id);
 
-     /**
-      * @param PostInterface $postObject
-      *
-      * @param PostInterface $postObject
-      * @return PostInterface
-      * @throws \Exception
-      */
-     public function save($eventObject);
- }
+    /**
+     * Zwraca wszystkie wydarenia
+     * 
+     * @return ArrayObject $events
+     */
+    public function findAllEvents();
+
+    /**
+     * Wyszukuje wydarzenia w zadanej odległości od podancyh współrzędnych
+     * 
+     * @param float $lat
+     * @param float $lng
+     * @param int $distance
+     * @return ArrayObject $events
+     */
+    public function findEventsInRadius($lat, $lng, $distance = 2);
+
+    /**
+     * Wyszukuje wydarzenia po nazwie, opisie, adresie oraz emailu
+     * 
+     * @param string $term
+     * @return ArrayObject $events
+     */
+    public function findEventsByTerm($term);
+
+    /**
+     * @param type $id
+     * @return Comment $commentt 
+     */
+    public function findComment($id);
+
+    /**
+     * Zapisuje nowy lub zmieniony obiekt bazie danych
+     * 
+     * @param object $entity
+     * @return object $entity
+     */
+    public function save($entity);
+
+    /**
+     * Usuwa obiekt z bazy danych
+     * 
+     * @param object $entity
+     * @return void
+     */
+    public function remove($entity);
+}

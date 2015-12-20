@@ -1,27 +1,12 @@
 <?php
 
-/*
- * The MIT License
+/**
+ * Zend Framework 2 Events Module
  *
- * Copyright 2015 pchel.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * @link      http://github.com/pchela/events 
+ * @copyright Copyright (c) 20015 Kowalski Piotr (http://www.kowalski-piotr.pl)
+ * @license   https://opensource.org/licenses/MIT
+ * @since     File available since Release 0.0.1
  */
 
 namespace Events\Form;
@@ -31,9 +16,16 @@ use Zend\Stdlib\Hydrator\ClassMethods;
 use Events\Entity\Event;
 use Zend\InputFilter\InputFilterProviderInterface;
 
+/**
+ * Zestaw pól formularza reprezentujących obiekt Event
+ */
 class EventFieldset extends Fieldset implements InputFilterProviderInterface
 {
 
+    /**
+     * @param  null|int|string  $name    Optional name for the element
+     * @param  array            $options Optional options for the element
+     */
     public function __construct($name = null, $options = array())
     {
         parent::__construct($name, $options);
@@ -79,7 +71,8 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
         ));
 
         $this->add(array(
-            'type' => 'Zend\Form\Element\DateTimeSelect',
+//            'type' => 'Zend\Form\Element\DateTime',
+            'type' => 'text',
             'name' => 'fromDate',
             'options' => array(
                 'label' => 'From',
@@ -87,15 +80,26 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
             )
         ));
         $this->add(array(
-            'type' => 'Zend\Form\Element\DateTimeSelect',
+            'type' => 'text',
+//            'type' => 'Zend\Form\Element\DateTime',
             'name' => 'toDate',
             'options' => array(
                 'label' => 'To',
                 'format' => "Y-m-d H:i:s"
+            ),
+            'attributes' => array(
+                "data-provide" => "datepicker",
+                'class' => 'form-control'
             )
         ));
     }
 
+    /**
+     * Should return an array specification compatible with
+     * {@link Zend\InputFilter\Factory::createInputFilter()}.
+     *
+     * @return array
+     */
     public function getInputFilterSpecification()
     {
         return array(
@@ -159,67 +163,23 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
             'fromDate' => array(
                 'required' => true,
                 'filters' => array(
-//                    array('name' => 'Zend\Filter\StringTrim'),
-////                    array('name' => 'Zend\Filter\StripTags'),
+                    // custom filter
+                    array('name' => 'Events\Form\Filter\ConvertToDateTime'),
                 ),
+                'validators' => array(
+                    // custom validator
+                    array('name' => 'Events\Form\Validator\isDateOffset'),
+                )
             ),
             'toDate' => array(
                 'required' => true,
                 'filters' => array(
-                    array(
-                        'name' => 'Callback',
-                        'options' => array(
-                            'callback' => function ($date)
-                            {
-                                // Convert the date to a specific format
-                                if (is_array($date))
-                                {
-                                    if (!isset($date['second']))
-                                    {
-                                        $date['second'] = '00';
-                                    }
-                                    $date = sprintf('%s-%s-%s %s:%s:%s', 
-                                            $date['year'], $date['month'], $date['day'], 
-                                            $date['hour'], $date['minute'], $date['second']
-                                    );
-                                }
-
-                                return $date;
-                            }
-                        )
-                    )
+                    // custom filter
+                    array('name' => 'Events\Form\Filter\ConvertToDateTime')
                 ),
                 'validators' => array(
-                    array(
-                        'name' => 'Zend\Validator\Callback',
-                        'options' => array(
-                            'messages' => array(
-                                \Zend\Validator\Callback::INVALID_VALUE => 'The departure time is less than the arrival time',
-                            ),
-                            'callback' => function($value, $context = array())
-                    {
-                        // value of this input
-                        $toDate = $value;
-                        // value of input to check against from context
-                        $fromDate = $context['fromDate'];
-                        // compare times, eg..
-                        $isValid = $toDate >= $fromDate;
-                        $fromDate = \DateTime::createFromFormat(
-                                        'Y-m-d', $fromDate['year'] . '-' .
-                                        $fromDate['month'] . '-' .
-                                        $fromDate['day']
-                        );
-
-                        $dayOffset = (int) (new \DateTime("now"))->diff($fromDate)->format('%R%a');
-                        if ((int) $dayOffset > Event::DAY_OFFSET)
-                        {
-                            $isValid = false;
-                        }
-
-                        return $isValid;
-                    },
-                        ),
-                    ),
+                    // custom validator
+                    array('name' => 'Events\Form\Validator\isDateAfter'),
                 ),
             ),
         );
