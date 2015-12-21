@@ -2,6 +2,7 @@ Zend Framework 2 Events Module
 ============================================
 ### Requirements
 + database 
++ PHP Version >= 5.4.28
 + PHP intl extension
 
 ### Installation
