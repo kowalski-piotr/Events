@@ -38,6 +38,19 @@ return array(
 
 ```
 
+Enable modules in application.config.php
+```
+return array(
+  'modules' => array(
+      // other modules
+        'DoctrineModule',
+        'DoctrineORMModule',
+        'Events',
+  ),
+  // other content
+);
+```
+
 Create db schema 
 
 ```sh
