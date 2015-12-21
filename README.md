@@ -63,5 +63,5 @@ $ php vendor/bin/doctrine-module orm:schema-tool:create
 ### Usage
 http://your-domain.app/events
 
-### Live example
+### Live preview
 http://zf2events.kowalski-piotr.pl/events
