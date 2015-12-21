@@ -19,6 +19,8 @@ use Zend\Mail\Message;
 use Zend\Mail\Transport\Sendmail;
 use Zend\Stdlib\ArrayObject;
 use Zend\Validator\EmailAddress;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
+use Zend\Mail\Transport\SmtpOptions;
 
 /**
  * Events\Controller\IndexController
@@ -85,7 +87,7 @@ class EventService implements EventServiceInterface
      * @param int $distance
      * @return ArrayObject $events
      */
-    public function searchEvent($term, $distance = 2)
+    public function searchEvents($term, $distance = 2)
     {
         $coordinates = $this->getCoordinates($term);
         $result = array();
@@ -94,9 +96,14 @@ class EventService implements EventServiceInterface
             $lng1 = $coordinates['lng'];
 
             $result = $this->eventMapper->findEventsInRadius(
-                    $lat1, $lng1, $distance);
+                    $lat1, $lng1, $offset, $limit, $distance);
         }
-        return empty($result) ? $this->eventMapper->findEventsByTerm($term) : $result;
+
+        if (empty($result)) {
+            return $this->eventMapper->findEventsByTerm($term, $offset, $limit);
+        }
+
+        return $result;
     }
 
     /**
@@ -142,14 +149,16 @@ class EventService implements EventServiceInterface
         }
 
         $mail = new Message();
-        $mail->setBody(
-                '<b>Description: </b>' . $event->getDescription() . '\n' .
-                '<b>Address :</b>' . $event->getAddress() . '\n' .
-                '<b>Date :</b>' . $event->getFromDate()->format("y-m-d")
-        );
         $mail->setFrom($event->getEmail(), $event->getEmail());
         $mail->addTo('admin@domena.pl', 'Administrator');
-        $mail->setSubject('New event: ' . $event->getName());
+        $mail->setSubject('Dodano nowe wydarzenie: ' . $event->getName());
+        $mail->setBody(
+                '<b>Nazwa: </b>' . $event->getName() . '\n' .
+                '<b>Opis: </b>' . $event->getDescription() . '\n' .
+                '<b>Adres :</b>' . $event->getAddress() . '\n' .
+                '<b>Data rozpoczęcia :</b>' . $event->getFromDate()->format("y-m-d H:i:s") . '\n' .
+                '<b>Data zakończenia :</b>' . $event->getFromDate()->format("y-m-d H:i:s") . '\n'
+        );
 
         $transport = new Sendmail();
         $transport->send($mail);

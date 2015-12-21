@@ -28,16 +28,28 @@ class SearchForm extends Form implements InputFilterProviderInterface
     {
         parent::__construct($name, $options);
 
+        $this->setAttributes(array(
+            "role" => "search",
+            "class" => "navbar-form"
+        ));
+
         $this->add(array(
             'name' => 'search',
             'type' => 'text',
+            'attributes' => array(
+                'class' => "form-control",
+                'placeholder' => "Szukaj wydarzeń",
+                'autocomplete' => "off",
+                'autofocus' => "autofocus",
+            ),
         ));
 
         $this->add(array(
             'type' => 'submit',
             'name' => 'submit',
             'attributes' => array(
-                'value' => 'Search events'
+                'value' => 'Szukaj',
+                'class' => "btn btn-default"
             ),
         ));
     }

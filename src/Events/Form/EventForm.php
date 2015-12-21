@@ -39,7 +39,8 @@ class EventForm extends Form
             'type' => 'submit',
             'name' => 'submit',
             'attributes' => array(
-                'value' => 'Insert new Event'
+                'value' => 'Wyślij',
+                'class' => "btn btn-default btn-lg btn-block"
             )
         ));
     }

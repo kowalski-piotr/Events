@@ -46,7 +46,7 @@ interface EventMapperInterface
      * @param int $distance
      * @return ArrayObject $events
      */
-    public function findEventsInRadius($lat, $lng, $distance = 2);
+    public function findEventsInRadius($lat, $lng, $distance);
 
     /**
      * Wyszukuje wydarzenia po nazwie, opisie, adresie oraz emailu

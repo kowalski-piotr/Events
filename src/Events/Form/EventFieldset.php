@@ -45,22 +45,24 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
             'name' => 'name',
             'options' => array(
                 'label' => 'Name'
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'placeholder' => 'Nazwa wydarzenia'
             )
         ));
 
-        $this->add(array(
-            'type' => 'text',
-            'name' => 'description',
-            'options' => array(
-                'label' => 'Description'
-            )
-        ));
+
 
         $this->add(array(
             'type' => 'text',
             'name' => 'address',
             'options' => array(
                 'label' => 'Address'
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'placeholder' => 'Adres'
             )
         ));
 
@@ -69,6 +71,10 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
             'name' => 'email',
             'options' => array(
                 'label' => 'Email'
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'placeholder' => 'Adres email'
             )
         ));
 
@@ -79,6 +85,10 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
             'options' => array(
                 'label' => 'From',
                 'format' => "Y-m-d H:i:s"
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'placeholder' => 'Data rozpoczęcia'
             )
         ));
         $this->add(array(
@@ -90,8 +100,21 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
                 'format' => "Y-m-d H:i:s"
             ),
             'attributes' => array(
-                "data-provide" => "datepicker",
-                'class' => 'form-control'
+                "data-provide" => "datepicker-inline",
+                'class' => 'form-control',
+                'placeholder' => 'Data zakończenia'
+            )
+        ));
+
+        $this->add(array(
+            'type' => 'text',
+            'name' => 'description',
+            'options' => array(
+                'label' => 'Description'
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'placeholder' => 'Opis wydarzenia'
             )
         ));
     }
@@ -222,7 +245,7 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
                             'format' => 'Y-m-d H:i'
                         ),
                     ),
-                    // custom validator
+                // custom validator
 //                    array('name' => 'Events\Form\Validator\isDateAfter'),
                 ),
             ),

@@ -50,8 +50,8 @@ interface EventServiceInterface
      * @param int $distance
      * @return ArrayObject $events
      */
-    public function searchEvent($term, $distance);
-    
+    public function searchEvents($term, $distance);
+
     /**
      * Wyszukuje współrzędne dla podanego adresu z wykorzystaniem
      * Google Maps Api i wstawia je do Wydarzenia 

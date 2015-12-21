@@ -2,43 +2,34 @@
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Users</h3>
+                <h3 class="panel-title">Events</h3>
             </div>
+            <style>
+                .sortable tr {
+                    cursor: pointer;
+                }
+            </style>
+
             <div class="panel-body">
-                <a href="/events/add">Add Event</a>
-                <a href="/events">Clear search</a>
-                <?php
-                $form = $this->form;
-                $form->setAttribute('action', $this->url());
-                $form->prepare();
-
-                echo $this->form()->openTag($form);
-
-                echo $this->formRow($form->get('search'));
-                echo $this->formSubmit($form->get('submit'));
-                
-                echo $this->form()->closeTag();
-                ?>
-
                 <?php if (isset($events)) : ?>
-                    <table class="table">
+                    <table class="table table-hover sortable">
                         <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>Title</th>
-                                <th>Address</th>
-                                <th></th>
+                                <th>Nazwa wydarzenia</th>
+                                <th>Adres</th>
+                                <th>Autor</th>
                             </tr>
                         </thead>
-                        <?php foreach ($events as $event): ?>
+                        <?php
+                        foreach ($events as $event):
+                            ?>
                             <tbody>
-                                <tr>
+                                <tr class='click-link' data-href="events/view/<?php echo $event->getId() ?>">
                                     <td><?php echo $event->getId(); ?></td>
                                     <td><?php echo $event->getName(); ?></td>
                                     <td><?php echo $event->getAddress(); ?></td>
-                                    <td>
-                                        <a href="events/view/<?php echo $event->getId() ?>">View</a>
-                                    </td>
+                                    <td><?php echo $event->getEmail(); ?></td>
                                 </tr>
                             </tbody>
                         <?php endforeach; ?>

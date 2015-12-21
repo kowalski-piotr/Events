@@ -2,36 +2,91 @@
 $title = 'View event';
 $this->headTitle($title);
 ?>
-<h1><?php echo $this->escapeHtml($title); ?></h1>
+<h1><?php echo $event->getName(); ?></h1>
+<hr>
+<div class="row">
+    <div class="col-md-6">
+        <h3>Opis wydarzenia</h3>
+        <p><?php echo $event->getDescription(); ?></p>
+    </div>
+    <div class="col-md-6">
+        <h3>Szczegóły</h3>
+        <span class="glyphicon glyphicon-calendar" aria-hidden="true">
+            <p class="edetails bigp">   <?php echo $event->getFromDate()->format('Y-m-d'); ?></p></span><br/>
+        <span class="glyphicon glyphicon-flag" aria-hidden="true">
+            <p class="edetails">   <?php echo $event->getAddress(); ?></p></span><br/>
+        <span class="glyphicon glyphicon-user" aria-hidden="true">
+            <p class="edetails">  <?php echo $event->getEmail(); ?></p></span> <br/>
+        <span class="glyphicon glyphicon-time" aria-hidden="true">
+            <p class="edetails">   <?php echo $event->getFromDate()->format('H:i'); ?> - <?php echo $event->getToDate()->format('H:i'); ?></p></span><br/>
+    </div>
+    <style>
+        .edetails {
+            /*margin-left: 10px;*/
+            display: inline-block;
+        }
+        .bigp {
+            font-size: 1.2em;
+        }
+    </style>
 
-<h2><?php echo $event->getName(); ?></h2>
-<h3><?php echo $event->getDescription(); ?></h3>
-<p> <?php echo $event->getAddress(); ?></p>
-<p> <?php echo $event->getEmail(); ?></p>
-<p> <?php echo $event->getFromDate()->format('Y-m-d H:i:s'); ?></p>
-<p> <?php echo $event->getToDate()->format('Y-m-d H:i:s'); ?></p>
-<?php foreach ($event->getComments() as $comment) : ?>
+</div>
+
+<div class="row">
+    <hr>
+    <div class="col-md-6">
+        <h3>Komentarze</h3>
+
+        <?php foreach ($event->getComments() as $comment) : ?>
 
 
-<h4 style="display: inline-block;"><small>email: </small><?php echo $comment->getEmail(); ?></h4>
-<a href="<?php echo $this->url('events', array('action' => 'removeComment', 'id' => $comment->getId())); ?>">
-    <span style="margin-left: 50px;" class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-</a>
-    <p><?php echo $comment->getContent(); ?></p>
+            <h4 style="display: inline-block;"><small>email: </small><?php echo $comment->getEmail(); ?></h4>
+            <a href="<?php
+            echo $this->url('events',
+                    array('action' => 'removeComment', 'id' => $comment->getId()));
+            ?>">
+                <span style="margin-left: 50px;" class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </a>
+            <p><?php echo $comment->getContent(); ?></p>
 
-<?php endforeach; ?>
+        <?php endforeach; ?>
+    </div>
+    <div class="col-md-6">
 
 
-<?php
-$form = $this->form;
 
 
-$tes = $this->url('events', array('action' => 'view', 'id' => $event->getId()));
-$form->prepare();
+        <h3>Napisz komentarz!</h3>
 
-echo $this->form()->openTag($form);
+        <?php
+        $form = $this->form;
 
-echo $this->formCollection($form);
+        $tes = $this->url('events',
+                array('action' => 'view', 'id' => $event->getId()));
+        $form->prepare();
+        ?>
 
-echo $this->form()->closeTag();
-?>
+        <?php echo $this->form()->openTag($form); ?>
+        <div class="form-group">
+            <label class="control-label" for="focusedInput">Email</label>
+            <?php echo $this->formInput($form->get('comment-fieldset')->get('email')); ?>
+            <?php echo $this->formElementErrors($form->get('comment-fieldset')->get('email'));?>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="focusedInput">Komentarz</label>
+            <?php echo $this->formInput($form->get('comment-fieldset')->get('content')); ?>
+            <?php echo $this->formElementErrors($form->get('comment-fieldset')->get('content'));?>
+        </div>
+        <div class="form-group">
+            <?php echo $this->formInput($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+
+
+
+    </div>
+</div>
+
+

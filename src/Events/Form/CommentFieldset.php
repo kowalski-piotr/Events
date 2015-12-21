@@ -45,13 +45,23 @@ class CommentFieldset extends Fieldset implements InputFilterProviderInterface
             'name' => 'email',
             'options' => array(
                 'label' => 'Email'
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'placeholder' => 'Podaj adres email'
             )
         ));
         $this->add(array(
-            'type' => 'text',
+            'type' => 'Zend\Form\Element\Textarea',
             'name' => 'content',
             'options' => array(
-                'label' => 'Description'
+                'label' => 'Wiadomość'
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'placeholder' => 'Twój komessntarz',
+                'rows' => "6",
+                'type' => 'textarea',
             )
         ));
     }

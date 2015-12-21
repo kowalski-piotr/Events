@@ -39,7 +39,8 @@ class CommentForm extends Form
             'type' => 'submit',
             'name' => 'submit',
             'attributes' => array(
-                'value' => 'Leave comment'
+                'value' => 'Wyślij',
+                'class' => "btn btn-default btn-lg btn-block"
             )
         ));
     }

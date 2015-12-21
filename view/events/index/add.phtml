@@ -1,12 +1,52 @@
 <!-- Filename: /module/Blog/view/blog/write/add.phtml -->
- <h1>WriteController::addAction()</h1>
- <?php
- $form = $this->form;
- $form->setAttribute('action', $this->url('events', array('action' => 'add')));
- $form->prepare();
+<div class="row">
+    <div class="col-md-6">
+        <h1>Dodaj wydarzenie</h1>
 
- echo $this->form()->openTag($form);
 
- echo $this->formCollection($form);
+        <?php
+        $form = $this->form;
+        $form->setAttribute('action',
+                $this->url('events', array('action' => 'add')));
+        $form->prepare();
+        ?>
+        <?php echo $this->form()->openTag($form); ?>
 
- echo $this->form()->closeTag();
+        <div class="form-group">
+            <label class="control-label" for="focusedInput">Nazwa wydarzenia</label>
+            <?php echo $this->formInput($form->get('event-fieldset')->get('name')); ?>
+            <?php echo $this->formElementErrors($form->get('event-fieldset')->get('name')); ?>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="focusedInput">Address</label>
+            <?php echo $this->formInput($form->get('event-fieldset')->get('address')); ?>
+            <?php echo $this->formElementErrors($form->get('event-fieldset')->get('address')); ?>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="focusedInput">Email</label>
+            <?php echo $this->formInput($form->get('event-fieldset')->get('email')); ?>
+            <?php echo $this->formElementErrors($form->get('event-fieldset')->get('email')); ?>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="focusedInput">Data rozpoczęcia</label>
+            <?php echo $this->formInput($form->get('event-fieldset')->get('fromDate')); ?>
+            <?php echo $this->formElementErrors($form->get('event-fieldset')->get('fromDate')); ?>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="focusedInput">Data zakończenia</label>
+            <?php echo $this->formInput($form->get('event-fieldset')->get('toDate')); ?>
+            <?php echo $this->formElementErrors($form->get('event-fieldset')->get('toDate')); ?>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="focusedInput">Opis wydarzenia</label>
+            <?php echo $this->formInput($form->get('event-fieldset')->get('description')); ?>
+            <?php echo $this->formElementErrors($form->get('event-fieldset')->get('description')); ?>
+        </div>
+        <div class="form-group">
+            <?php echo $this->formInput($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>

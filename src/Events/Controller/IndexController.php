@@ -20,6 +20,9 @@ use Events\Service\EventService;
 use Events\Service\EventServiceInterface;
 use Exception;
 use Zend\Mvc\Controller\AbstractActionController;
+use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrineAdapter;
+use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
+use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
 
 /**
@@ -55,10 +58,12 @@ class IndexController extends AbstractActionController
      */
     public function indexAction()
     {
+
         $events = array();
         $errors = array();
         $searchForm = new SearchForm();
         $request = $this->getRequest();
+        $page = $this->params()->fromRoute('page', 1);
 
         //Jeżeli wysłano zapytanie o wyniki wyszukiwania
         //zwracamy tylko wydarzenia spełniające warunki
@@ -67,7 +72,8 @@ class IndexController extends AbstractActionController
             if ($searchForm->isValid()) {
                 $term = $searchForm->get('search')->getValue();
                 try {
-                    $events = $this->eventService->searchEvent($term);
+                    $events = $this->eventService
+                            ->searchEvents($term, $offset, $limit);
                 } catch (Exception $e) {
                     // TODO: Log exception
                     // TODO: Translation
@@ -76,7 +82,7 @@ class IndexController extends AbstractActionController
             }
         } else {
             //Jeżeli nie wysłano zapytania o wyniki wyszukiwania 
-            //zwracamy wszystkie wydarzenia
+            //zwracamy wszystkie dla danej strony
             $events = $this->eventService->getAllEvents();
         }
 
@@ -111,7 +117,7 @@ class IndexController extends AbstractActionController
 
                     // wiadomość do administratora o dodaniu wydarzenia 
                     // nie działa na serwerze lokalnym
-//                    $this->eventService->sendNotify($event, 'admin..admin.pl');
+//                    $this->eventService->sendNotify($event, 'admin@admin.pl');
 
                     return $this->redirect()->toRoute('events',
                                     array('action' => 'view', 'id' => $event->getId()));
@@ -164,7 +170,7 @@ class IndexController extends AbstractActionController
             $commentForm->setData($request->getPost());
 
             if ($commentForm->isValid()) {
-                $comment->setEvent($event);
+                $event->addComment($comment);
 
                 // zapisujemy IP użytkownika dodającego komentarz
                 $userIp = $request->getServer()->get('REMOTE_ADDR');
@@ -205,15 +211,13 @@ class IndexController extends AbstractActionController
             return $this->redirect()->toUrl($previousUrl);
         }
 
-        // jeżeli podano niepoprawny identyfikator w adresie, 
-        // przekieruj do strony tworzenia nowego wydarzenia
-        $event = $this->eventService->getEvent($id);
-        if (!$event instanceof Event) {
-            return $this->redirect()->toUrl($previousUrl);
-        }
-
         try {
+            // jeżeli podano niepoprawny identyfikator w adresie, 
+            // przekieruj do strony tworzenia nowego wydarzenia
             $comment = $this->eventService->getComment($id);
+            if (!$comment instanceof Comment) {
+                return $this->redirect()->toUrl($previousUrl);
+            }
             $this->eventService->remove($comment);
         } catch (Exception $e) {
             // TODO: Log exception

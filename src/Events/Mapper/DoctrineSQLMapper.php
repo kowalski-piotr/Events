@@ -13,7 +13,11 @@ namespace Events\Mapper;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Events\Entity\Comment;
+use Events\Entity\Event;
 use Events\Mapper\EventMapperInterface;
+use Zend\Paginator\Paginator;
+use Zend\Stdlib\ArrayObject;
 
 /**
  * Events\Mapper\DoctrineSQLMapper
@@ -167,6 +171,7 @@ class DoctrineSQLMapper implements EventMapperInterface
     public function remove($entity)
     {
         $this->entityManger->remove($entity);
-        $this->entityManger->flush($entity);
+        $this->entityManger->flush();
     }
+
 }
