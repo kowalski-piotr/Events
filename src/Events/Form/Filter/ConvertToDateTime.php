@@ -17,8 +17,7 @@ use Zend\Filter\DateTimeFormatter;
 /**
  * Events\Form\Filter\ConvertToDateTime
  * 
- * Filtr konwertujący format daty zwracany przez element 
- * Zend\Form\Element\DateTimeSelect na format DateTime 
+ * Filtr konwertujący datę na DateTime 
  */
 class ConvertToDateTime extends DateTimeFormatter
 {

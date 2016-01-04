@@ -79,7 +79,6 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
         ));
 
         $this->add(array(
-//            'type' => 'Zend\Form\Element\DateTime',
             'type' => 'text',
             'name' => 'fromDate',
             'options' => array(
@@ -93,7 +92,6 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
         ));
         $this->add(array(
             'type' => 'text',
-//            'type' => 'Zend\Form\Element\DateTime',
             'name' => 'toDate',
             'options' => array(
                 'label' => 'To',
@@ -188,7 +186,7 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
             'fromDate' => array(
                 'required' => true,
                 'filters' => array(
-                    // custom filter
+                    // filtr konwertujący dane z pola formularza na format DateTime
                     array(
                         'name' => 'Events\Form\Filter\ConvertToDateTime',
                         'options' => array(
@@ -197,28 +195,19 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
                     ),
                 ),
                 'validators' => array(
-                    // custom validator
                     array(
                         'name' => 'Zend\Validator\Date',
                         'options' => array(
                             'format' => 'Y-m-d H:i:s'
                         )
                     ),
+                    // walidator porównujący datę z pola formularza z podaną datą (min)
                     array(
                         'name' => 'Events\Form\Validator\DateGreaterThan',
                         'options' => array(
                             'min' => (new DateTime("now"))->add(new DateInterval('P7D')),
                         ),
                     ),
-//                    array('name' => 'Events\Form\Validator\isDateOffset'),
-//                    array(
-//                        'name' => 'Zend\Validator\DateStep',
-//                        'options' => array(
-//                            'format' => 'Y-m-d H:i:s',
-//                            'baseValue' => new DateTime("now"),
-//                            'step' => new DateInterval('P7D')
-//                        ),
-//                    ),
                 )
             ),
             'toDate' => array(
@@ -245,8 +234,6 @@ class EventFieldset extends Fieldset implements InputFilterProviderInterface
                             'format' => 'Y-m-d H:i'
                         ),
                     ),
-                // custom validator
-//                    array('name' => 'Events\Form\Validator\isDateAfter'),
                 ),
             ),
         );

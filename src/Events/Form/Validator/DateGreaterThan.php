@@ -17,7 +17,10 @@ use DateTime;
 use Zend\Validator\GreaterThan;
 
 /**
- * Description of DateGeaterThan
+ * Events\Form\Validator\DateGreaterThan
+ * 
+ * Walidator sprawdzający czy data jest większa (bądź równa) 
+ * od drugiej podanej daty (opcja min)
  *
  */
 class DateGreaterThan extends GreaterThan
