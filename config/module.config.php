@@ -26,42 +26,6 @@ return array(
                     ),
                 ),
                 'may_terminate' => true,
-//                'child_routes' => array(
-//                    'detail' => array(
-//                        'type' => 'segment',
-//                        'options' => array(
-//                            'route' => '/:id',
-//                            'defaults' => array(
-//                                'action' => 'detail'
-//                            ),
-//                            'constraints' => array(
-//                                'id' => '\d+'
-//                            )
-//                        )
-//                    ),
-//                    'add' => array(
-//                        'type' => 'literal',
-//                        'options' => array(
-//                            'route' => '/add',
-//                            'defaults' => array(
-//                                'controller' => 'Events\Controller\Index',
-//                                'action' => 'add'
-//                            )
-//                        )
-//                    ),
-//                    'view' => array(
-//                        'type' => 'segment',
-//                        'options' => array(
-//                            'route' => '/view/:id',
-//                            'defaults' => array(
-//                                'action' => 'view'
-//                            ),
-//                            'constraints' => array(
-//                                'id' => '\d+'
-//                            )
-//                        ),
-//                    )
-//                )
             ),
         ),
     ),
@@ -70,15 +34,13 @@ return array(
             'Events\Service\EventServiceInterface' => 'Events\Factory\EventServiceFactory',
             'Events\Mapper\EventMapperInterface' => 'Events\Factory\DoctrineSQLMapperFactory',
         ),
-//        'invokables' => array(
-//            'Events\Service\MapsServiceInterface' => 'Events\Service\GoogleMapsService',
-//        )
     ),
     'controllers' => array(
         'factories' => array(
             'Events\Controller\Index' => 'Events\Factory\IndexControllerFactory',
         )
     ),
+    // oddzielny layout dla modułu Events (ustawienia w Module.php)
     'module_layouts' => array(
         'Events' => 'events/layout',
     ),

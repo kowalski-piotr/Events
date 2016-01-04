@@ -14,18 +14,16 @@ namespace Events;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
-/**
- * Events\Factory\IndexControllerFactory
- * 
- * Fabryka tworząca obiekt klasy IndexController
- */
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface
 {
 
     public function onBootstrap($e)
     {
+        //dodanie wyszukiwarki dla wszystkich widoków
         $viewModel = $e->getApplication()->getMvcEvent()->getViewModel();
         $viewModel->searchForm = new Form\SearchForm();
+        
+        //wczytanie własnego layoutu dla modułu
         $e->getApplication()->getEventManager()->getSharedManager()->attach('Zend\Mvc\Controller\AbstractController',
                 'dispatch',
                 function($e)
